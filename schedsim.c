@@ -13,7 +13,7 @@ void findWaitingTimeRR(ProcessType plist[], int n,int quantum)
 
      //1. Create an array *rem_bt[]* to keep track of remaining burst time of processes. This array is initially a copy of *plist[].bt* (all processes burst times)
     int rem_bt[n];
-    for (int 1 = 0; i < n; i++){
+    for (int i = 0; i < n; i++){
       rem_bt[i] = plist[i].bt;
       plist[i].wt = 0; //2. Store waiting times of processes in plist[].wt. Initialize this array as 0.
     }
@@ -122,13 +122,19 @@ void findTurnAroundTime( ProcessType plist[], int n)
 // Function to sort the Process acc. to priority
 int my_comparer(const void *this, const void *that)
 { 
-  
-    /*  
-     * 1. Cast this and that into (ProcessType *)
-     * 2. return 1 if this->pri < that->pri
-     */ 
-  
-    return 1;
+  ProcessType *p1 = (ProcessType *)this;
+  ProcessType *p2 = (ProcessType *)that;
+
+  //Sorts by priority
+  if (p1 -> pri != p2 -> pri){
+    return p2 -> pri - p1 -> pri;
+  }
+
+  //Optional tie-breaker by PID or Arrival Time
+  if (p1 -> art != p2 -> art){
+    return p1 -> art - p2 -> art;
+  }
+  return p1 -> pid - p2 -> pid;
 } 
 
 //Function to calculate average time 
@@ -178,6 +184,13 @@ void findavgTimePriority( ProcessType plist[], int n)
     * 1- Sort the processes (i.e. plist[]), burst time and priority according to the priority.
     * 2- Now simply apply FCFS algorithm.
     */
+    qsort(plist, n, sizeof(ProcessType), my_comparer);
+
+    //Calculate waiting time for sorted list
+    findWaitingTime(plist, n);
+
+    //Calculate turn around time
+    findTurnAroundTime(plist, n);
   
     //Display processes along with all details 
     printf("\n*********\nPriority\n");
