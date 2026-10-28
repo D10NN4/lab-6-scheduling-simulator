@@ -47,17 +47,56 @@ void findWaitingTimeRR(ProcessType plist[], int n,int quantum)
 // processes 
 void findWaitingTimeSJF(ProcessType plist[], int n)
 { 
-      /*
-       * 1 Traverse until all process gets completely executed.
-         - Find process with minimum remaining time at every single time lap.
-         - Reduce its time by 1.
-         - Check if its remaining time becomes 0 
-         - Increment the counter of process completion.
-         - Completion time of *current process = current_time +1;*
-         - Calculate waiting time for each completed process. *wt[i]= Completion time - arrival_time-burst_time*
-         - Increment time lap by one.
- 
-     */
+  int rem_bt[n];
+  for (int i = 0; i < n; i++){
+    rem_bt[i] = plist[i].bt;
+  }
+
+  int complete = 0;
+  int t = 0;
+  int minm = INT_MAX;
+  int shortest = 0;
+  int check = 0;
+
+  while (complete != n){
+    //Find process with minimum remaining time at every single time lap.
+    minm = INT_MAX;
+    check = 0;
+
+    for (int j = 0; j < n; j++){
+      if ((plist[j].art <= t) && (rem_bt[j] < minm) && rem_bt[j] > 0){
+        minm = rem_bt[j];
+        shortest = j;
+        check = 1;
+      }
+    }
+
+    if (check == 0){
+      t++;
+      continue;
+    }
+
+    //Reduce its time by 1.
+    rem_bt[shortest]--;
+
+    //Check if its remaining time becomes 0 
+    if (rem_bt[shortest] == 0){
+      complete++;
+
+      //Completion time of *current process = current_time +1;*
+      int finish_time = t + 1;
+      
+      //*wt[i]= Completion time - arrival_time-burst_time*
+      plist[shortest].wt = finish_time - plist[shortest].art - plist[shortest].bt;
+
+      if (plist[shortest].wt < 0){
+        plist[shortest].wt = 0;
+      }
+    }
+
+    //Increment time lap by one.
+    t++;
+  }
 } 
 
 // Function to find the waiting time for all  
